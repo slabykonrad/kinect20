@@ -4,6 +4,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.Kinect;
 using System.Windows.Shapes;
 using System.Windows.Controls;
+using System;
 
 namespace kinect20
 {
@@ -62,6 +63,8 @@ namespace kinect20
 
                             Joint handRight = body.Joints[JointType.HandRight];
                             drawPointToTracking(handRight, handRightCanvas);
+
+                            calculateAngle(handRight, elbowRight, shoulderRight);
                         }
                     }
                 }
@@ -96,10 +99,37 @@ namespace kinect20
                 DepthSpacePoint depthSpacePoint = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(bodyJoint.Position);
                 Ellipse circle = new Ellipse() { Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)) };
                 canvasPoint.Children.Add(circle);
-                Canvas.SetLeft(circle, depthSpacePoint.X - 25);
-                Canvas.SetRight(circle, depthSpacePoint.Y - 25);
-
+                Canvas.SetLeft(circle, depthSpacePoint.X);
+                Canvas.SetRight(circle, depthSpacePoint.Y);
             }
+        }
+
+        private void calculateAngle(Joint hand, Joint elbow, Joint shoulder)
+        {
+            DepthSpacePoint depthSpacePointHand = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(hand.Position);
+            DepthSpacePoint depthSpacePointElbow = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(elbow.Position);
+            DepthSpacePoint depthSpacePointShoulder = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(shoulder.Position);
+
+            double[] elbowHand = { (depthSpacePointHand.X - depthSpacePointElbow.X),
+                                    (depthSpacePointHand.Y - depthSpacePointElbow.Y)};
+
+            double[] elbowShoulder = { (depthSpacePointShoulder.X - depthSpacePointElbow.X),
+                                    (depthSpacePointShoulder.Y - depthSpacePointElbow.Y)};
+
+            double elbowHandMagnitude = Math.Sqrt(elbowHand[0] * elbowHand[0] + elbowHand[1] * elbowHand[1]);
+            double elbowShoulderMagnitude = Math.Sqrt(elbowShoulder[0] * elbowShoulder[0]
+                + elbowShoulder[1] * elbowShoulder[1]);
+
+            //normalization
+            elbowHand[0] /= elbowHandMagnitude;
+            elbowHand[1] /= elbowHandMagnitude;
+
+            elbowShoulder[0] /= elbowShoulderMagnitude;
+            elbowShoulder[1] /= elbowShoulderMagnitude;
+
+            double result = elbowHand[0] * elbowShoulder[0] + elbowHand[1] * elbowShoulder[1];
+            double angle = Math.Acos(result) * 180 / Math.PI;
+            label.Content = angle.ToString();
         }
     }
 }
