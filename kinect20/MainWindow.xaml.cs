@@ -2,6 +2,8 @@
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Kinect;
+using System.Windows.Shapes;
+using System.Windows.Controls;
 
 namespace kinect20
 {
@@ -9,6 +11,7 @@ namespace kinect20
     {
         KinectSensor kinectSensor = null;
         MultiSourceFrameReader multiSourceFrameReader = null;
+        Body[] bodies;
 
         public MainWindow()
         {
@@ -25,9 +28,8 @@ namespace kinect20
                 kinectSensor.Open();
             }
 
-            multiSourceFrameReader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color |
-                                                                             FrameSourceTypes.Depth |
-                                                                             FrameSourceTypes.Infrared);
+            multiSourceFrameReader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Body |
+                                                                             FrameSourceTypes.Color);
 
             multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameReader_MultiSourceFrameArrived;
         }
@@ -36,11 +38,32 @@ namespace kinect20
         {
             var reference = e.FrameReference.AcquireFrame();
 
-            using (var frame = reference.ColorFrameReference.AcquireFrame())
+            using (ColorFrame multiSourceFrame = reference.ColorFrameReference.AcquireFrame())
+            using (BodyFrame bodyFrame = reference.BodyFrameReference.AcquireFrame())
             {
-                if (frame != null)
+                if (multiSourceFrame != null && bodyFrame != null)
                 {
-                    kinectImage.Source = ToBitmap(frame);
+                    kinectImage.Source = ToBitmap(multiSourceFrame);
+                    bodies = new Body[bodyFrame.BodyFrameSource.BodyCount];
+                    bodyFrame.GetAndRefreshBodyData(bodies);
+                    elbowRightCanvas.Children.Clear();
+                    handRightCanvas.Children.Clear();
+                    shoulderRightCanvas.Children.Clear();
+
+                    foreach (Body body in bodies)
+                    {
+                        if(body.IsTracked)
+                        {
+                            Joint shoulderRight = body.Joints[JointType.ShoulderRight];
+                            drawPointToTracking(shoulderRight, shoulderRightCanvas);
+
+                            Joint elbowRight = body.Joints[JointType.ElbowRight];
+                            drawPointToTracking(elbowRight, elbowRightCanvas);
+
+                            Joint handRight = body.Joints[JointType.HandRight];
+                            drawPointToTracking(handRight, handRightCanvas);
+                        }
+                    }
                 }
             }
         }
@@ -66,5 +89,17 @@ namespace kinect20
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
         }
 
+        private void drawPointToTracking(Joint bodyJoint, Canvas canvasPoint)
+        {
+            if (bodyJoint.TrackingState == TrackingState.Tracked)
+            {
+                DepthSpacePoint depthSpacePoint = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(bodyJoint.Position);
+                Ellipse circle = new Ellipse() { Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)) };
+                canvasPoint.Children.Add(circle);
+                Canvas.SetLeft(circle, depthSpacePoint.X - 25);
+                Canvas.SetRight(circle, depthSpacePoint.Y - 25);
+
+            }
+        }
     }
 }

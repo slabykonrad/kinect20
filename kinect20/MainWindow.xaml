@@ -8,5 +8,8 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <Image Name="kinectImage" Width="512" Height="424" />
+        <Canvas Name="elbowRightCanvas" Width="512" Height="424" />
+        <Canvas Name="handRightCanvas" Width="512" Height="424" />
+        <Canvas Name="shoulderRightCanvas" Width="512" Height="424" />
     </Grid>
 </Window>
