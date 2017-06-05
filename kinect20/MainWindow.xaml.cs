@@ -97,10 +97,10 @@ namespace kinect20
             if (bodyJoint.TrackingState == TrackingState.Tracked)
             {
                 DepthSpacePoint depthSpacePoint = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(bodyJoint.Position);
-                Ellipse circle = new Ellipse() { Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)) };
+                Ellipse circle = new Ellipse() { Width = 25, Height = 25, Fill = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)) };
                 canvasPoint.Children.Add(circle);
                 Canvas.SetLeft(circle, depthSpacePoint.X);
-                Canvas.SetRight(circle, depthSpacePoint.Y);
+                Canvas.SetTop(circle, depthSpacePoint.Y);
             }
         }
 
