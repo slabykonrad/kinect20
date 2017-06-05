@@ -11,6 +11,6 @@
         <Canvas Name="elbowRightCanvas" Width="512" Height="424" />
         <Canvas Name="handRightCanvas" Width="512" Height="424" />
         <Canvas Name="shoulderRightCanvas" Width="512" Height="424" />
-        <Label Name="label" Height="38" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></Label>
+        <Label Name="label" FontSize="28" Background="WhiteSmoke" Foreground="Red" FontWeight="Bold" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></Label>
     </Grid>
 </Window>
