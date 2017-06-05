@@ -5,12 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:kinect20"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Width="1024" Height="848" >
     <Grid>
-        <Image Name="kinectImage" Width="512" Height="424" />
-        <Canvas Name="elbowRightCanvas" Width="512" Height="424" />
-        <Canvas Name="handRightCanvas" Width="512" Height="424" />
-        <Canvas Name="shoulderRightCanvas" Width="512" Height="424" />
-        <Label Name="label" FontSize="28" Background="WhiteSmoke" Foreground="Red" FontWeight="Bold" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></Label>
+        <Image Name="kinectImage" Width="1024" Height="848" />
+        <Canvas Name="elbowRightCanvas" Width="1024" Height="848" />
+        <Canvas Name="handRightCanvas" Width="1024" Height="848" />
+        <Canvas Name="shoulderRightCanvas" Width="1024" Height="848" />
+        <Canvas Name="elbowLeftCanvas" Width="1024" Height="848" />
+        <Canvas Name="handLeftCanvas" Width="1024" Height="848" />
+        <Canvas Name="shoulderLeftCanvas" Width="1024" Height="848" />
+        <Label Name="labelLeft" FontSize="28" Background="WhiteSmoke" Foreground="Red" FontWeight="Bold" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></Label>
+        <Label Name="labelRight" FontSize="28" Background="WhiteSmoke" Foreground="Red" FontWeight="Bold" Margin="780,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></Label>
     </Grid>
 </Window>

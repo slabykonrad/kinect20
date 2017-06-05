@@ -51,20 +51,37 @@ namespace kinect20
                     handRightCanvas.Children.Clear();
                     shoulderRightCanvas.Children.Clear();
 
+                    elbowLeftCanvas.Children.Clear();
+                    handLeftCanvas.Children.Clear();
+                    shoulderLeftCanvas.Children.Clear();
+
                     foreach (Body body in bodies)
                     {
                         if(body.IsTracked)
                         {
+
                             Joint shoulderRight = body.Joints[JointType.ShoulderRight];
-                            drawPointToTracking(shoulderRight, shoulderRightCanvas);
+                            drawPointToTrackingByDepthSpace(shoulderRight, shoulderRightCanvas);
 
                             Joint elbowRight = body.Joints[JointType.ElbowRight];
-                            drawPointToTracking(elbowRight, elbowRightCanvas);
+                            drawPointToTrackingByDepthSpace(elbowRight, elbowRightCanvas);
 
                             Joint handRight = body.Joints[JointType.HandRight];
-                            drawPointToTracking(handRight, handRightCanvas);
+                            drawPointToTrackingByDepthSpace(handRight, handRightCanvas);
 
-                            calculateAngle(handRight, elbowRight, shoulderRight);
+                            calculateAngle(handRight, elbowRight, shoulderRight, labelRight);
+
+
+                            Joint shoulderLeft = body.Joints[JointType.ShoulderLeft];
+                            drawPointToTrackingByColorSpace(shoulderLeft, shoulderLeftCanvas);
+
+                            Joint elbowLeft = body.Joints[JointType.ElbowLeft];
+                            drawPointToTrackingByColorSpace(elbowLeft, elbowLeftCanvas);
+
+                            Joint handLeft = body.Joints[JointType.HandLeft];
+                            drawPointToTrackingByColorSpace(handLeft, handLeftCanvas);
+
+                            calculateAngle(handLeft, elbowLeft, shoulderLeft, labelLeft);
                         }
                     }
                 }
@@ -92,19 +109,33 @@ namespace kinect20
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
         }
 
-        private void drawPointToTracking(Joint bodyJoint, Canvas canvasPoint)
+        private void drawPointToTrackingByDepthSpace(Joint bodyJoint, Canvas canvasPoint)
         {
             if (bodyJoint.TrackingState == TrackingState.Tracked)
             {
                 DepthSpacePoint depthSpacePoint = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(bodyJoint.Position);
                 Ellipse circle = new Ellipse() { Width = 25, Height = 25, Fill = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)) };
                 canvasPoint.Children.Add(circle);
-                Canvas.SetLeft(circle, depthSpacePoint.X);
-                Canvas.SetTop(circle, depthSpacePoint.Y);
+                Canvas.SetLeft(circle, depthSpacePoint.X*2);
+                Canvas.SetTop(circle, depthSpacePoint.Y*2);
             }
         }
 
-        private void calculateAngle(Joint hand, Joint elbow, Joint shoulder)
+        private void drawPointToTrackingByColorSpace(Joint bodyJoint, Canvas canvasPoint)
+        {
+            if (bodyJoint.TrackingState == TrackingState.Tracked)
+            {
+                ColorSpacePoint colorSpacePoint = kinectSensor.CoordinateMapper.MapCameraPointToColorSpace(bodyJoint.Position);
+                Ellipse circle = new Ellipse() { Width = 25, Height = 25, Fill = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)) };
+                canvasPoint.Children.Add(circle);
+                //Canvas.SetLeft(circle, colorSpacePoint.X - circle.Width / 2);
+                //Canvas.SetTop(circle, colorSpacePoint.Y - circle.Height / 2);
+                Canvas.SetLeft(circle, colorSpacePoint.X * (1024/(double)1980));
+                Canvas.SetTop(circle, colorSpacePoint.Y * (848/(double)1080));
+            }
+        }
+
+        private void calculateAngle(Joint hand, Joint elbow, Joint shoulder, Label label)
         {
             DepthSpacePoint depthSpacePointHand = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(hand.Position);
             DepthSpacePoint depthSpacePointElbow = kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(elbow.Position);
